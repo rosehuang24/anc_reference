@@ -87,3 +87,23 @@ tabix 116combineVCFs/116.${chrm}_${startpos}_${endpos}.vcf.gz
 
 python3 $parentDIR/useful_scripts/anc_state_infer.py  -I 116combineVCFs/116.${chrm}_${startpos}_${endpos}.vcf.gz -O 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf -Alist $TXTDIR/GJF.popline.txt
 
+python3 $parentDIR/useful_scripts/lineage_polymorphisms.py -I 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz -A $TXTDIR/RJF.popline.txt -Ao lineage_vcfs/RJF.polymorphisms.${chrm}_${startpos}_${endpos}.vcf -B $TXTDIR/DC.98.DL.popline.txt -Bo lineage_vcfs/DC.98.polymorphisms.${chrm}_${startpos}_${endpos}.vcf
+
+#gunzip 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz
+#bgzip 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf
+#tabix 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz
+
+#parallel file=$TXTDIR/DC.98.DL.popline.txt or RJF.popline.txt 
+vcftools --vcf lineage_vcfs/DC.98.polymorphisms.${chrm}_${startpos}_${endpos}.vcf \
+        --indv INDV \
+        --non-ref-ac 1 --recode \
+        --out indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}
+bgzip indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}.recode.vcf
+tabix indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}.recode.vcf.gz
+
+
+
+
+
+
+
