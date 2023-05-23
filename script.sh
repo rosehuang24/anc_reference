@@ -102,7 +102,10 @@ bgzip indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}.recode.vcf
 tabix indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}.recode.vcf.gz
 
 
+indv=`head -n ${SLURM_ARRAY_TASK_ID}  $TXTDIR/107.breed_indv_depth.DULO.txt | tail -n1 | awk '{print $2}'`
+#remember to check mergelist of TBC_1 and DL_1: they often include TBC_10 and 11, and DL_10. THINK of SOMETHING!!
 
+picard MergeVcfs I=merge.list/$indv.merge.list O=indv_vcfs/$indv.lineage_poly.swapped.vcf
 
 
 
