@@ -84,29 +84,59 @@ gjfs=tmp/gjfallsites_repRemoved.noAD.${chrm}_${startpos}_${endpos}.recode.vcf
 bcftools merge $gjfs $poolAD -O z -o 116combineVCFs/116.${chrm}_${startpos}_${endpos}.vcf.gz
 tabix 116combineVCFs/116.${chrm}_${startpos}_${endpos}.vcf.gz
 
+#there will be multi alllelic sites. REMOVE THEM!!!
+vcfttols --gzvcf 116combineVCFs/116.${chrm}_${startpos}_${endpos}.vcf.gz \
+        --min-alleles 2 --max-alleles 2 \
+        --max-missing-count 105 \
+        --recode --out 116combineVCFs/116.${chrm}_${startpos}_${endpos}.biallelic.missing_removed
+bgzip 116combineVCFs/116.${chrm}_${startpos}_${endpos}.biallelic.missing_removed.recode.vcf
+tabix 116combineVCFs/116.${chrm}_${startpos}_${endpos}.biallelic.missing_removed.recode.vcf.gz
+
 
 python3 $parentDIR/useful_scripts/anc_state_infer.py  -I 116combineVCFs/116.${chrm}_${startpos}_${endpos}.vcf.gz -O 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf -Alist $TXTDIR/GJF.popline.txt
 
-python3 $parentDIR/useful_scripts/lineage_polymorphisms.py -I 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz -A $TXTDIR/RJF.popline.txt -Ao lineage_vcfs/RJF.polymorphisms.${chrm}_${startpos}_${endpos}.vcf -B $TXTDIR/DC.98.DL.popline.txt -Bo lineage_vcfs/DC.98.polymorphisms.${chrm}_${startpos}_${endpos}.vcf
 
-#gunzip 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz
-#bgzip 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf
-#tabix 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz
+#--------------------------------------------------------------------------------------------------------------
+##########_INDV_#############
+#--------------------------------------------------------------------------------------------------------------
 
-#parallel file=$TXTDIR/DC.98.DL.popline.txt or RJF.popline.txt 
-vcftools --vcf lineage_vcfs/DC.98.polymorphisms.${chrm}_${startpos}_${endpos}.vcf \
+vcftools --gzvcf 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz \
         --indv INDV \
-        --non-ref-ac 1 --recode \
-        --out indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}
-bgzip indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}.recode.vcf
-tabix indv_vcfs/INDV.DC_poly.swapped.${chrm}_${startpos}_${endpos}.recode.vcf.gz
+        --recode \
+        --out indv_vcfs/INDV.swapped.${chrm}_${startpos}_${endpos}
+
+bgzip indv_vcfs/INDV.swapped.${chrm}_${startpos}_${endpos}.recode.vcf
+tabix indv_vcfs/INDV.swapped.${chrm}_${startpos}_${endpos}.recode.vcf.gz
 
 
-indv=`head -n ${SLURM_ARRAY_TASK_ID}  $TXTDIR/107.breed_indv_depth.DULO.txt | tail -n1 | awk '{print $2}'`
-#remember to check mergelist of TBC_1 and DL_1: they often include TBC_10 and 11, and DL_10. THINK of SOMETHING!!
+rm indv_vcfs/INDV.${chrm}_${startpos}_${endpos}.recode.vcf.gz*
 
-picard MergeVcfs I=merge.list/$indv.merge.list O=indv_vcfs/$indv.lineage_poly.swapped.vcf
-
+python3 $parentDIR/useful_scripts/alt_allele.py -I indv_vcfs/INDV.swapped.${chrm}_${startpos}_${endpos}.recode.vcf.gz -O indv_vcfs/INDV.alt.${chrm}_${startpos}_${endpos}.vcf
 
 
+indv=`head -n ${SLURM_ARRAY_TASK_ID}  $TXTDIR/107.breed_indv_depth.DL.txt | tail -n1 | awk '{print $2}'`
+#
+picard MergeVcfs I=merge.list/$indv.merge.list O=indv_vcfs/$indv.swapped.rep.removed.vcf.gz
+
+tabix indv_vcfs/$indv.swapped.rep.removed.vcf.gz
+
+rm indv_vcfs/$indv.*alt*
+
+#--------------------------------------------------------------------------------------------------------------
+##########_POP_##########
+#--------------------------------------------------------------------------------------------------------------
+popfile=$TXTDIR/107.pop_names_cap.DL.txt 
+pop=`head -n ${SLURM_ARRAY_TASK_ID} $popfile|tail -n1 | awk '{print $1}'`
+
+indvlist=$TXTDIR/POP.popline.txt
+
+vcftools --gzvcf 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz \
+	--keep $indvlist \
+	--recode \
+	--out pop_vcfs/POP.${chrm}_${startpos}_${endpos}
+
+bgzip pop_vcfs/POP.${chrm}_${startpos}_${endpos}.recode.vcf
+tabix pop_vcfs/POP.${chrm}_${startpos}_${endpos}.recode.vcf.gz
+
+picard MergeVcfs I=merge.list/$pop.list O=pop_vcfs/$pop.vcf.gz
 
