@@ -83,7 +83,7 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
             anc_ls=[ls[int(i)] for i in indices_pop]
             #print(anc_ls)
             miss=int(ls.count("./."))-int(anc_ls.count("./."))
-            if "0/1" not in anc_ls and miss<6:
+            if "0/1" not in anc_ls and miss<12:
 
                 if anc_ls.count("1/1")>=7 and anc_ls.count("0/0") == 0:
                     line=lines.strip().split()
