@@ -61,8 +61,8 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
             outah.write(lines)
             outsh.write(lines)
         elif lines.startswith("#CHROM"):
-            outah.write("INFO=<ID=StatsUnswapped,Number=0,Type=Flag,Description=\"Allele state change\n\"")
-            outsh.write("INFO=<ID=StatsUnswapped,Number=0,Type=Flag,Description=\"Allele state change\n\"")
+            outah.write("INFO=<ID=StatsUnswapped,Number=0,Type=Flag,Description=\"Allele state change\""+"\n")
+            outsh.write("INFO=<ID=StatsUnswapped,Number=0,Type=Flag,Description=\"Allele state change\""+"\n")
             outah.write(lines)
             line=lines.strip().split()
             outsh.write('\t'.join(line[0:9])+"\n")
