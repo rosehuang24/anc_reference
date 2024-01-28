@@ -95,8 +95,8 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
                         elif ls[x] == '.':
                             ls[x]='./.'
                 #    print(ls)
-                    outsh.write("\t".join(line[:3])+"\t"+line[4]+"\t"+line[3]+"\t"+"\t".join(line[5:7])+"\tStatsSwapped\tGT")
-                    outah.write('\t'.join(line[0:7])+"\tStatsUnswapped\tGT\t"+"\t".join(ls))
+                    outsh.write("\t".join(line[:3])+"\t"+line[4]+"\t"+line[3]+"\t"+"\t".join(line[5:7])+"\tStatsSwapped\tGT"+"\n")
+                    outah.write('\t'.join(line[0:7])+"\tStatsUnswapped\tGT\t"+"\t".join(ls)+"\n")
                 elif anc_ls.count("0/0")>=7 and anc_ls.count("1/1") == 0:
                     outah.write(lines)
             #print(anc_ls.count("0/0"))
