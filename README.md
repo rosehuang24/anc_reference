@@ -56,3 +56,25 @@ python3 anc_state_infer.py \
         -O 116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf \
         -Alist GJF.popline.txt
 ```
+
+
+## 3 I have also extracted positions of homozygotes and heteriozygotes as bed files
+
+I did this after many of the analysis, but this should speed up the process if applied. 
+
+
+```
+vcftools --gzvcf indv_vcfs/$indv.WG.swapped.aO.recode.vcf.gz \
+        --max-non-ref-ac 1 \
+        --recode --out indv_vcfs/$indv.het
+grep -v "#" indv_vcfs/$indv.het.recode.vcf | awk '{print$1"\t"$2-1"\t"$2}' > indv_vcfs/$indv.het.pos.bed
+
+
+vcftools --gzvcf indv_vcfs/$indv.WG.swapped.aO.recode.vcf.gz \
+        --non-ref-ac 2 --recode \
+        --out indv_vcfs/$indv.hom
+grep -v "#" indv_vcfs/$indv.hom.recode.vcf | awk '{print$1"\t"$2-1"\t"$2}' > indv_vcfs/$indv.hom.pos.bed
+
+#rm indv_vcfs/$indv.het.recode.vcf 
+#rm indv_vcfs/$indv.hom.recode.vcf
+```
