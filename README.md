@@ -35,6 +35,21 @@ tabix 116combineVCFs/116.${chrm}_${startpos}_${endpos}.biallelic.missing_removed
 
 ```
 ## 2. Use python script to infer the ancestral state. 
+20240128：note! Read the ```anc_swapped_twofiles_20240128.py```, there will be miscategorization if directly change the allele state. 
+
+Use the code below instead
+```
+python3 $scriptdir/anc_state_infer_twofiles_20240128.py -I 116combineVCFs/116.${chrm}_${startpos}_${endpos}.biallelic.missing_removed.recode.vcf.gz \
+       -aO 116combineVCFs/swapped_aO.${chrm}_${startpos}_${endpos}.vcf \
+       -sO 116combineVCFs/swapped_sO.${chrm}_${startpos}_${endpos}.vcf \
+       -Alist $TXTDIR/GJF.popline.txt
+
+bgzip 116combineVCFs/swapped_aO.${chrm}_${startpos}_${endpos}.vcf
+tabix 116combineVCFs/swapped_aO.${chrm}_${startpos}_${endpos}.vcf.gz
+```
+
+
+old code:
 ```
 python3 anc_state_infer.py \
         -I 116combineVCFs/116.${chrm}_${startpos}_${endpos}.biallelic.missing_removed.recode.vcf.gz \
